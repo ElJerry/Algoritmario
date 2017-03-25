@@ -1,0 +1,88 @@
+#include <cstdio>
+#include <algorithm>
+
+using namespace std;
+
+int arr[10000], n, tam, num;
+void insertar(int numero)
+{
+    ///el parámetro de esta función es el número que queremos insertar
+    tam++;///Cada que queramos insertar un número el tamaño de nuestro montículo aumenta
+    int vertice = tam;
+    arr[vertice] = numero;///al principio el número que insertemos va a estar en la última posición del montículo
+    int papa = vertice/2;
+    while(vertice != 1 && arr[vertice] > arr[papa])
+    {
+        swap(arr[papa], arr[vertice]);
+        vertice = papa;
+        papa = vertice/2;
+    }
+}
+
+void borrar()
+{
+    /**El número que está en la raiz siempre va a ser el más grande del montículo,
+       por lo que lo mandamos a la posición tam de nuestro arreglo.
+       (De esta forma al más grande le va a tocar la posición n, al 2o más grande la n-1 y así susesivamente**/
+
+    swap(arr[1], arr[tam]); ///Aquí mandamos al de la posición tam a la raíz, para volver a acomodar el montículo
+
+        /**A pesar de que ambos números siguen siendo parte de nustro arreglo,
+           el que mandamos a la posición tam ya no forma parte de nuestro montículo, porque reducimos tam en 1 (tam--)**/
+    tam--;
+    int vertice = 1;
+    int iz = vertice * 2;
+    int der = vertice * 2 + 1;
+    ///Si la raiz está en 1 entonces los hijos de un nodo i serán i*2 y (i*2)+1; y su padre será i/2
+    ///Si la raiz está en 0 entonces los hijos de un nodo i serán (i*2)+1 y (i+1)*2; y su padre será (i-1)/2
+
+    /**Checamos si alguno se los hijos del vertice tiene un valor mayor,
+    y de ser ese el caso, cambiamos el valor del vertice con el valor del mayor de sus hijos**/
+
+    /**Aquí antes de hacer el intercambio y las comparaciones nos aseguramos de que el hijo izquierdo y el hijo derecho
+       formen parte de nuestro montículo, en otras palabras, que el nodo sí tengo hijos y no se encuentre en el último nivel,
+       si no verificamos esto, entonces en algún momento realizaríamos comparaciones con números del arreglo que ya no
+       forman parte de nuestro montículo.**/
+    while((iz<=tam && arr[iz]>arr[vertice]) || (der<=tam && arr[der]>arr[vertice]))
+    {
+        ///iz<=tam y der<=tam se utilizan para checar que esos nodos aún sean parte de nuestro montículo
+        /**Si alguno de los hijos de ese vertice fue mayor hacemos el cambio,
+           y ahora la posicion del numero que estamos acomodando toma la posición de dicho hijo.**/
+        if(der<=tam && arr[der] > arr[iz])
+        {
+            swap(arr[der], arr[vertice]);
+            vertice = der;
+        }
+        else
+        {
+            swap(arr[iz], arr[vertice]);
+            vertice = iz;
+        }
+
+        iz = vertice * 2;
+        der = vertice * 2 + 1;
+    }
+
+}
+
+int main()
+{
+    scanf("%d", &n);
+
+    for(int i=1; i<=n; i++)
+    {
+        scanf("%d", &num);
+        insertar(num);///Inserto cada número conforme lo voy leyendo
+    }
+    for(int i=n; i>=1; i--)
+    {
+        ///Voy borrando y reacomodando cada uno de los números del montículo
+        borrar();
+    }
+
+    for(int i=1; i<=n; i++)
+    {
+        printf("%d ", arr[i]);
+    }
+    return 0;
+}
